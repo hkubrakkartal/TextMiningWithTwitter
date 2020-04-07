@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Feb  5 15:50:42 2020
-
-@author: admin
-"""
-
 # Libraries ..
 import tweepy as tw
 import pandas as pd
@@ -147,7 +140,7 @@ plt.imshow(wordcloud)
 plt.axis('off')
 plt.show()
 #%%
-# Sentiment Analysis
+# Sentiment Analysis with Bar Plot
 dataframe = pd.read_csv("out.csv")
 
 def percantage(part, whole):
@@ -195,7 +188,7 @@ sns.barplot(df["Sizes"],df["Values"],data=df, hue="Values")
 plt.show()
 print('The number of positive/negative/neutral words in text')
 
-#%%   Sentiment analiz with Pie Chart
+#%%   Sentiment Analysis with Pie Chart
 dataframe = pd.read_csv("out.csv") 
 def percantage(part, whole):
     return 100 * float(part)/float(whole)
