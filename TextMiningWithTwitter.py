@@ -12,18 +12,18 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize, RegexpTokenizer,TweetTokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-#%%
+
 # Twitter Api
 # define keys
 consumer_key=""
 consumer_secret=""
 access_token=""
 access_token_secret=""
+
 #Twitter connect code
 baglanti = tw.OAuthHandler(consumer_key, consumer_secret)
 baglanti.set_access_token(access_token, access_token_secret)
 api=tw.API(baglanti,wait_on_rate_limit=True)
-#%%
 all_tweets = []
 
 #choose = input("choose:")
@@ -38,16 +38,14 @@ print(search_words)
 for tweet in tweets:
     print(tweet.text) 
     print ("**")
+    
 df = pd.DataFrame(Out, columns=['Search_words','Tweets'])
-
 df.to_csv("out.csv", encoding='utf-8', index=False)
-#%%
+
 data = pd.read_csv("out.csv")
 print('Count total number of Tweets')
 print('*****')
-print(data.head(5))
-data.tail(5)
-#%%
+
 #  remove punctuations
 def remove_punctuations(text):
     text = ' '.join([i for i in text if i not in frozenset(string.punctuation)])
@@ -73,35 +71,30 @@ def remove_digits(text):
     text = re.sub('[0-9]+','', text)
     text = re.sub('_[A-Za-z0-9./]+','', text)
     return text
-#%%
+
+#
 data['Tweets_2'] = data['Tweets'].apply(remove_url_and_user)
 data['Tweets_3'] = data['Tweets_2'].str.replace('RT','') # RT ifadesi silindi
 data['Tweets_3'] = data['Tweets_3'].apply(lambda x: x.lower()) # bütün harfler küçük
 
 tokenizer = RegexpTokenizer(r'\w+')
-#datafr['Tweets'] = datafr['Tweets'].apply(lambda x: word_tokenize(x))
 data['Tweets_4'] = data['Tweets_3'].apply(lambda x: tokenizer.tokenize(x))
-
 data['cleaned'] = data['Tweets_4'].apply(remove_stopword) # çok kullanılan kelimeler silindi.
 data['cleaned'] = data['cleaned'].apply(remove_punctuations) # noktalama işaretleri silindi.
 data['cleaned'] = data['cleaned'].apply(remove_digits) # sayısal değerleri silindi.
 
-data.head(20)
-#%%
-print(data['cleaned'].loc[1:20])
-#%%
 w_tokenizer = nltk.tokenize.WhitespaceTokenizer()
 lemmatizer = nltk.stem.WordNetLemmatizer()
 
+# lemmatize
 def lemmatize_text(text):
     return [lemmatizer.lemmatize(w) for w in w_tokenizer.tokenize(text)]
 
 data['temiz'] = data['cleaned'].apply(lemmatize_text)
 data['temiz'].loc[1:10]
-#%%
+
 # TF_IDF (Term Frequency — Inverse Document Frequency) 
 vectorizer = TfidfVectorizer()
-#corpus = list(seri)
 sentence_list = []
 for i in data['cleaned']:
     sentence_list.append(i)
@@ -109,15 +102,13 @@ corpus = list(sentence_list)
 x = vectorizer.fit(corpus)
 print(vectorizer.get_feature_names())
 print(x.vocabulary_)
-#%%
 X = vectorizer.transform(corpus)
 print(X.shape)
 print(X)
 print(X.toarray())
-#%%
 df = pd.DataFrame(X.toarray(), columns= vectorizer.get_feature_names())
 df.T
-#%%
+
 # Number of all words  in tweets
 word_list = []
 
@@ -128,7 +119,7 @@ for tweet in data['cleaned']:
 seri = pd.Series(data=word_list)
 print("Count total number of words in text: ", seri.count())
 seri.value_counts()
-#%%
+
 # WordCloud
 plt.subplots(figsize=(8,8))
 wordcloud = WordCloud(
@@ -139,7 +130,7 @@ wordcloud = WordCloud(
 plt.imshow(wordcloud)
 plt.axis('off')
 plt.show()
-#%%
+
 # Sentiment Analysis with Bar Plot
 dataframe = pd.read_csv("out.csv")
 
@@ -188,7 +179,7 @@ sns.barplot(df["Sizes"],df["Values"],data=df, hue="Values")
 plt.show()
 print('The number of positive/negative/neutral words in text')
 
-#%%   Sentiment Analysis with Pie Chart
+#   Sentiment Analysis with Pie Chart
 dataframe = pd.read_csv("out.csv") 
 def percantage(part, whole):
     return 100 * float(part)/float(whole)
